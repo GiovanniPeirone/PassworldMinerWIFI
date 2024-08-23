@@ -1,2 +1,4 @@
 # PassworldMinerWIFI
-Este es un proyecto el cual infeca a varias computadoras para probar multimpes contraseñas de seguridad de WIFI
+This is a project which infects multiple computers to test multiple WIFI security passwords.
+
+
